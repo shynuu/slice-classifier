@@ -98,6 +98,12 @@ func InitRouter(secure bool, production bool) error {
 			"/adm",
 			HandleAdmissionControl,
 		},
+		{
+			"update",
+			METHODPOST,
+			"/update",
+			HandleUpdateAdmissionControl,
+		},
 	}
 
 	NewRouter(dataPlaneRouter, "/data-plane", router)
