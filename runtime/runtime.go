@@ -188,7 +188,7 @@ func (c *Classification) updateTree(Controls []ADMControl) error {
 			return err
 		}
 
-		runTC("qdisc", "replace", "dev", iface, "root", "handle", "1:", "htb", "r2q", "10")
+		// runTC("qdisc", "replace", "dev", iface, "root", "handle", "1:", "htb", "r2q", "10")
 
 		// voipClass := c.Queues[iface]*10 + 2
 		restClass := c.Queues[iface]*10 + 1
