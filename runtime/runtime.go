@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net"
 	"os"
 	"os/exec"
@@ -32,6 +33,10 @@ func runTC(args ...string) error {
 
 var runtime *Runtime
 var classificator *Classification
+
+func ConvertFloat(bw float64) int {
+	return int(math.Round(bw))
+}
 
 func FindNetwork(ipV4 string) (string, error) {
 
@@ -116,7 +121,7 @@ type Classification struct {
 	Ifaces  []string
 }
 
-func (c *Classification) calculateBurst(rate int) string {
+func (c *Classification) calculateBurst(rate float64) string {
 	// var b float64 = 18.0 / (30.0 / float64(rate))
 	// var burst float64 = math.Ceil(b)
 	// return fmt.Sprintf("%dk", int(burst*4))
@@ -156,13 +161,13 @@ func (c *Classification) buildTree(Controls []ADMControl) error {
 		}
 
 		rootClass := fmt.Sprintf("1:%d", c.Queues[iface])
-		runTC("class", "add", "dev", iface, "parent", "1:", "classid", rootClass, "htb", "rate", fmt.Sprintf("%dmbit", adm.Throughput), "burst", c.calculateBurst(adm.Throughput), "cburst", c.calculateBurst(adm.Throughput), "mtu", "1500")
+		runTC("class", "add", "dev", iface, "parent", "1:", "classid", rootClass, "htb", "rate", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput)), "burst", c.calculateBurst(adm.Throughput), "cburst", c.calculateBurst(adm.Throughput), "mtu", "1500")
 
 		voipClasss := fmt.Sprintf("1:%d", voipClass)
 		restClasss := fmt.Sprintf("1:%d", restClass)
 		runTC("class", "add", "dev", iface, "parent", rootClass, "classid", voipClasss, "htb", "rate", "2mbit", "prio", "0", "burst", "3k", "cburst", "3k", "mtu", "1500")
 		runTC("qdisc", "add", "dev", iface, "parent", voipClasss, "sfq", "perturb", "10")
-		runTC("class", "add", "dev", iface, "parent", rootClass, "classid", restClasss, "htb", "rate", fmt.Sprintf("%dmbit", adm.Throughput-1), "ceil", fmt.Sprintf("%dmbit", adm.Throughput-1), "prio", "1", "burst", c.calculateBurst(adm.Throughput-1), "cburst", c.calculateBurst(adm.Throughput-1), "mtu", "1500")
+		runTC("class", "add", "dev", iface, "parent", rootClass, "classid", restClasss, "htb", "rate", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput-1)), "ceil", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput-1)), "prio", "1", "burst", c.calculateBurst(adm.Throughput-1), "cburst", c.calculateBurst(adm.Throughput-1), "mtu", "1500")
 		runTC("qdisc", "add", "dev", iface, "parent", restClasss, "sfq", "perturb", "10")
 
 		c.Queues[iface]++
@@ -189,7 +194,7 @@ func (c *Classification) updateTree(Controls []ADMControl) error {
 		restClass := c.Queues[iface]*10 + 1
 
 		rootClass := fmt.Sprintf("1:%d", c.Queues[iface])
-		runTC("class", "replace", "dev", iface, "parent", "1:", "classid", rootClass, "htb", "rate", fmt.Sprintf("%dmbit", adm.Throughput), "burst", c.calculateBurst(adm.Throughput), "cburst", c.calculateBurst(adm.Throughput), "mtu", "1500")
+		runTC("class", "replace", "dev", iface, "parent", "1:", "classid", rootClass, "htb", "rate", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput)), "burst", c.calculateBurst(adm.Throughput), "cburst", c.calculateBurst(adm.Throughput), "mtu", "1500")
 
 		voipClasss := fmt.Sprintf("1:%d", voipClass)
 		restClasss := fmt.Sprintf("1:%d", restClass)

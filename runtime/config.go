@@ -49,9 +49,9 @@ type PDU struct {
 }
 
 type ADMControl struct {
-	SliceID    uint8  `json:"slice_id" yaml:"slice_id" bson:"slice_id"`
-	Throughput int    `json:"throughput" yaml:"throughput" bson:"throughput"`
-	Endpoint   string `json:"endpoint" yaml:"endpoint" bson:"endpoint"`
+	SliceID    uint8   `json:"slice_id" yaml:"slice_id" bson:"slice_id"`
+	Throughput float64 `json:"throughput" yaml:"throughput" bson:"throughput"`
+	Endpoint   string  `json:"endpoint" yaml:"endpoint" bson:"endpoint"`
 }
 
 type ADM struct {
