@@ -200,7 +200,7 @@ func (c *Classification) updateTree(Controls []ADMControl) error {
 		restClasss := fmt.Sprintf("1:%d", restClass)
 		runTC("class", "replace", "dev", iface, "parent", rootClass, "classid", voipClasss, "htb", "rate", "2mbit", "prio", "0", "burst", "3k", "cburst", "3k", "mtu", "1500")
 		runTC("qdisc", "replace", "dev", iface, "parent", voipClasss, "sfq", "perturb", "10")
-		runTC("class", "replace", "dev", iface, "parent", rootClass, "classid", restClasss, "htb", "rate", fmt.Sprintf("%dmbit", adm.Throughput-1), "ceil", fmt.Sprintf("%dmbit", adm.Throughput-1), "prio", "1", "burst", c.calculateBurst(adm.Throughput-1), "cburst", c.calculateBurst(adm.Throughput-1), "mtu", "1500")
+		runTC("class", "replace", "dev", iface, "parent", rootClass, "classid", restClasss, "htb", "rate", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput-1)), "ceil", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput-1)), "prio", "1", "burst", c.calculateBurst(adm.Throughput-1), "cburst", c.calculateBurst(adm.Throughput-1), "mtu", "1500")
 		runTC("qdisc", "replace", "dev", iface, "parent", restClasss, "sfq", "perturb", "10")
 
 	}
