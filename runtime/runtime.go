@@ -213,17 +213,10 @@ type Runtime struct {
 }
 
 func (r *Runtime) UpdateAdmissionControl(adm *ADM) error {
-
-	if adm.Aware {
-		log.Println("Setting up the data-plane for Slice Awareness")
-		classificator.updateTree(adm.Controls)
-		r.Aware = true
-		return nil
-	}
-
-	log.Println("Slice Awareness Deactivated")
+	log.Println("Updating Admission Control Rules")
+	classificator.updateTree(adm.Controls)
+	r.Aware = true
 	return nil
-
 }
 
 func (r *Runtime) AdmissionControl(adm *ADM) error {
