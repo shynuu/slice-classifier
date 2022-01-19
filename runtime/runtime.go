@@ -19,6 +19,7 @@ import (
 var admission *ADM
 
 func runTC(args ...string) error {
+	log.Println(args)
 	cmd := exec.Command("/sbin/tc", args...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
