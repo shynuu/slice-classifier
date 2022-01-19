@@ -189,22 +189,16 @@ func (c *Classification) updateTree(Controls []ADMControl) error {
 			return err
 		}
 
-		c.Queues[iface] = 1
-		// runTC("qdisc", "replace", "dev", iface, "root", "handle", "1:", "htb", "r2q", "10")
+		c.Queues[iface] = k + 1
 
-		// voipClass := c.Queues[iface]*10 + 2
 		restClass := c.Queues[iface]*10 + 1
 
 		rootClass := fmt.Sprintf("1:%d", c.Queues[iface])
 		runTC("class", "replace", "dev", iface, "parent", "1:", "classid", rootClass, "htb", "rate", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput)), "burst", c.calculateBurst(adm.Throughput), "cburst", c.calculateBurst(adm.Throughput), "mtu", "1500")
 
-		// voipClasss := fmt.Sprintf("1:%d", voipClass)
 		restClasss := fmt.Sprintf("1:%d", restClass)
-		// runTC("class", "replace", "dev", iface, "parent", rootClass, "classid", voipClasss, "htb", "rate", "2mbit", "prio", "0", "burst", "3k", "cburst", "3k", "mtu", "1500")
-		// runTC("qdisc", "replace", "dev", iface, "parent", voipClasss, "sfq", "perturb", "10")
 		runTC("class", "replace", "dev", iface, "parent", rootClass, "classid", restClasss, "htb", "rate", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput-1)), "ceil", fmt.Sprintf("%dmbit", ConvertFloat(adm.Throughput-1)), "prio", "1", "burst", c.calculateBurst(adm.Throughput-1), "cburst", c.calculateBurst(adm.Throughput-1), "mtu", "1500")
-		// runTC("qdisc", "replace", "dev", iface, "parent", restClasss, "sfq", "perturb", "10")
-		c.Queues[iface]++
+
 	}
 
 	return nil
